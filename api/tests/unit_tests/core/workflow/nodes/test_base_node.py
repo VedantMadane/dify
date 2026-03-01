@@ -72,6 +72,32 @@ def test_node_initialization_falls_back_to_node_type_when_data_type_is_missing()
     assert node.node_data.type == NodeType.ANSWER
 
 
+def test_node_initialization_rejects_empty_config_id():
+    graph_config: dict[str, object] = {}
+    init_params, runtime_state = _build_context(graph_config)
+
+    with pytest.raises(ValueError, match="non-empty string"):
+        _SampleNode(
+            id="node-1",
+            config={"id": "", "data": {"type": NodeType.ANSWER, "title": "Sample", "foo": "bar"}},
+            graph_init_params=init_params,
+            graph_runtime_state=runtime_state,
+        )
+
+
+def test_node_initialization_rejects_mismatched_config_id():
+    graph_config: dict[str, object] = {}
+    init_params, runtime_state = _build_context(graph_config)
+
+    with pytest.raises(ValueError, match="does not match constructor id"):
+        _SampleNode(
+            id="node-1",
+            config={"id": "node-2", "data": {"type": NodeType.ANSWER, "title": "Sample", "foo": "bar"}},
+            graph_init_params=init_params,
+            graph_runtime_state=runtime_state,
+        )
+
+
 def test_missing_generic_argument_raises_type_error():
     graph_config: dict[str, object] = {}
 

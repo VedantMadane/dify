@@ -90,6 +90,7 @@ class HttpRequestNodeData(BaseNodeData):
     Code Node Data.
     """
 
+    # Keep default for backward compatibility with model construction paths.
     type: NodeType = NodeType.HTTP_REQUEST
     method: Literal[
         "get",

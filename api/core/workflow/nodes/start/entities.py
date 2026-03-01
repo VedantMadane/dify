@@ -12,5 +12,6 @@ class StartNodeData(BaseNodeData):
     Start Node Data
     """
 
+    # Keep default for backward compatibility with model construction paths.
     type: NodeType = NodeType.START
     variables: Sequence[VariableEntity] = Field(default_factory=list)
