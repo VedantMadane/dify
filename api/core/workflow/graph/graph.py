@@ -194,6 +194,27 @@ class Graph:
 
         return nodes
 
+    @staticmethod
+    def _is_custom_note_node(node_config: object) -> bool:
+        """
+        Check whether a raw graph node is a UI-only custom note node.
+
+        Custom note nodes are not executable workflow nodes, and their `data.type`
+        field may be empty, so they must be filtered out before strict node schema
+        validation.
+        """
+        if not isinstance(node_config, Mapping):
+            return False
+
+        if node_config.get("type") == "custom-note":
+            return True
+
+        node_data = node_config.get("data")
+        if not isinstance(node_data, Mapping):
+            return False
+
+        return node_data.get("type") == "custom-note"
+
     @classmethod
     def new(cls) -> GraphBuilder:
         """Create a fluent builder for assembling a graph programmatically."""
@@ -299,12 +320,12 @@ class Graph:
         node_configs = graph_config.get("nodes", [])
 
         edge_configs = cast(list[dict[str, object]], edge_configs)
+        node_configs = cast(list[object], node_configs)
+        node_configs = [node_config for node_config in node_configs if not cls._is_custom_note_node(node_config)]
         node_configs = _ListNodeConfigDict.validate_python(node_configs)
 
         if not node_configs:
             raise ValueError("Graph must have at least one node")
-
-        node_configs = [node_config for node_config in node_configs if node_config.get("type", "") != "custom-note"]
 
         # Parse node configurations
         node_configs_map = cls._parse_node_configs(node_configs)

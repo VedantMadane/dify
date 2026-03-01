@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 
 import pytest
+from pydantic import ValidationError
 
 from core.workflow.entities import GraphInitParams
 from core.workflow.enums import NodeType
@@ -49,13 +50,28 @@ def test_node_hydrates_data_during_initialization():
 
     node = _SampleNode(
         id="node-1",
-        config={"id": "node-1", "data": {"title": "Sample", "foo": "bar"}},
+        config={"id": "node-1", "data": {"type": NodeType.ANSWER, "title": "Sample", "foo": "bar"}},
         graph_init_params=init_params,
         graph_runtime_state=runtime_state,
     )
 
     assert node.node_data.foo == "bar"
     assert node.title == "Sample"
+
+
+def test_node_initialization_requires_data_type():
+    graph_config: dict[str, object] = {}
+    init_params, runtime_state = _build_context(graph_config)
+
+    with pytest.raises(ValidationError) as exc_info:
+        _SampleNode(
+            id="node-1",
+            config={"id": "node-1", "data": {"title": "Sample", "foo": "bar"}},
+            graph_init_params=init_params,
+            graph_runtime_state=runtime_state,
+        )
+
+    assert "type" in str(exc_info.value)
 
 
 def test_missing_generic_argument_raises_type_error():

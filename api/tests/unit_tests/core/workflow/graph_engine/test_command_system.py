@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 from core.app.entities.app_invoke_entities import InvokeFrom
 from core.workflow.entities.graph_init_params import GraphInitParams
 from core.workflow.entities.pause_reason import SchedulingPause
+from core.workflow.enums import NodeType
 from core.workflow.graph import Graph
 from core.workflow.graph_engine import GraphEngine, GraphEngineConfig
 from core.workflow.graph_engine.command_channels import InMemoryChannel
@@ -39,7 +40,7 @@ def test_abort_command():
     # Create mock nodes with required attributes - using shared runtime state
     start_node = StartNode(
         id="start",
-        config={"id": "start", "data": {"title": "start", "variables": []}},
+        config={"id": "start", "data": {"type": NodeType.START, "title": "start", "variables": []}},
         graph_init_params=GraphInitParams(
             tenant_id="test_tenant",
             app_id="test_app",
@@ -149,7 +150,7 @@ def test_pause_command():
 
     start_node = StartNode(
         id="start",
-        config={"id": "start", "data": {"title": "start", "variables": []}},
+        config={"id": "start", "data": {"type": NodeType.START, "title": "start", "variables": []}},
         graph_init_params=GraphInitParams(
             tenant_id="test_tenant",
             app_id="test_app",
@@ -205,7 +206,7 @@ def test_update_variables_command_updates_pool():
 
     start_node = StartNode(
         id="start",
-        config={"id": "start", "data": {"title": "start", "variables": []}},
+        config={"id": "start", "data": {"type": NodeType.START, "title": "start", "variables": []}},
         graph_init_params=GraphInitParams(
             tenant_id="test_tenant",
             app_id="test_app",

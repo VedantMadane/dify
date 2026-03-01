@@ -126,6 +126,33 @@ def test_graph_initialization_runs_default_validators(
     assert "answer" in graph.nodes
 
 
+def test_graph_initialization_filters_custom_note_nodes_before_validation(
+    graph_init_dependencies: tuple[_SimpleNodeFactory, dict[str, object]],
+):
+    node_factory, graph_config = graph_init_dependencies
+    graph_config["nodes"] = [
+        {
+            "id": "note",
+            "type": "custom-note",
+            "data": {
+                "type": "",
+                "title": "",
+                "text": "UI-only note node",
+            },
+        },
+        {"id": "start", "data": {"type": NodeType.START, "title": "Start", "execution_type": NodeExecutionType.ROOT}},
+        {"id": "answer", "data": {"type": NodeType.ANSWER, "title": "Answer"}},
+    ]
+    graph_config["edges"] = [
+        {"source": "start", "target": "answer", "sourceHandle": "success"},
+    ]
+
+    graph = Graph.init(graph_config=graph_config, node_factory=node_factory)
+
+    assert "note" not in graph.nodes
+    assert graph.root_node.id == "start"
+
+
 def test_graph_validation_fails_for_unknown_edge_targets(
     graph_init_dependencies: tuple[_SimpleNodeFactory, dict[str, object]],
 ) -> None:
