@@ -245,10 +245,6 @@ class Node(Generic[NodeDataT]):
         if "id" not in config:
             raise ValueError("node config missing required 'id' field")
         node_id = config["id"]
-        if not isinstance(node_id, str) or not node_id.strip():
-            raise ValueError("node config 'id' field must be a non-empty string")
-        if node_id != id:
-            raise ValueError(f"node config 'id' field ('{node_id}') does not match constructor id ('{id}')")
 
         self._node_id = node_id
         self._node_execution_id: str = ""

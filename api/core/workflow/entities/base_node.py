@@ -181,7 +181,6 @@ class BaseNodeData(ABC, BaseModel):
     model_config = ConfigDict(extra="allow")
 
     type: NodeType
-    # Keep empty default for backward compatibility with legacy graph payloads.
     title: str = ""
     desc: str | None = None
     version: str = "1"
