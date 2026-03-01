@@ -223,6 +223,12 @@ class Node(Generic[NodeDataT]):
         graph_init_params: GraphInitParams,
         graph_runtime_state: GraphRuntimeState,
     ) -> None:
+        """
+        Initialize a node and hydrate typed node data from config.
+
+        For backward compatibility, when incoming mapping-based `data` misses a
+        `type`, this constructor fills it with `self.node_type` before validation.
+        """
         self._graph_init_params = graph_init_params
         self.id = id
         self.tenant_id = graph_init_params.tenant_id
@@ -250,6 +256,8 @@ class Node(Generic[NodeDataT]):
         if isinstance(config["data"], BaseNodeData):
             self._node_data = self._node_data_type.model_validate(config["data"], from_attributes=True)
         elif isinstance(config["data"], dict):
+            if "type" not in config["data"]:
+                config["data"]["type"] = self.node_type
             self._node_data = self._node_data_type.model_validate(config["data"])
         else:
             raise TypeError(f"node config 'data' field must be a dict or {self._node_data_type.__name__} instance")
